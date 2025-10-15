@@ -5,6 +5,7 @@ import { TContext } from "../../utils/types";
 import { ROUTER_ADDRESS, WBNB_ADDRESS } from "../../utils/address";
 import { ROUTER_ABI } from "../../utils/abi";
 import { BaseContract } from "../base";
+import { logError, logInfo, logWarn } from "../../utils/logger";
 
 type Target = {
   token: string;
@@ -37,7 +38,7 @@ export class Sniper extends BaseContract {
     try {
       return JSON.parse(text) as T;
     } catch (err) {
-      console.error("Failed to parse JSON:", err);
+      logError("Failed to parse JSON:", err);
       return null;
     }
   }
@@ -48,14 +49,14 @@ export class Sniper extends BaseContract {
 
     const cfg = this.safeParseJson<SniperConfig>(raw);
     if (!cfg || !Array.isArray(cfg.targets)) {
-      console.warn("No valid targets found in config.sniper.json");
+      logWarn("No valid targets found in config.sniper.json");
       return;
     }
 
     for (const t of cfg.targets) {
       // Validate minimal required field
       if (!t?.token) {
-        console.warn("Skipping invalid target (missing token):", t);
+        logWarn("Skipping invalid target (missing token):", t);
         continue;
       }
 
@@ -66,7 +67,7 @@ export class Sniper extends BaseContract {
       try {
         await this.buyToken(t.token, maxBnb, slippage);
       } catch (buyErr) {
-        console.error(`buyToken failed for ${t.token}:`, buyErr);
+        logError(`buyToken failed for ${t.token}:`, buyErr);
         // Decide: continue on error (current behaviour) or rethrow
       }
     }
@@ -122,7 +123,7 @@ export class Sniper extends BaseContract {
           }
         } catch (err) {
           // swallow provider balance failure — not fatal, but log
-          console.warn(
+          logWarn(
             "Could not confirm wallet balance:",
             (err as Error).message
           );
@@ -138,7 +139,7 @@ export class Sniper extends BaseContract {
       const expectedOut = amounts[amounts.length - 1];
       const minOut = computeMinOut(expectedOut, slippageBips);
 
-      console.info(
+      logInfo(
         {
           tokenAddress,
           maxBnb,
@@ -149,7 +150,7 @@ export class Sniper extends BaseContract {
       );
 
       if (this.simulationOnly) {
-        console.info("SimulationOnly is enabled — not sending transaction");
+        logInfo("SimulationOnly is enabled — not sending transaction");
         return { simulationOnly: true };
       }
 
@@ -170,7 +171,7 @@ export class Sniper extends BaseContract {
           (BigInt(estimated.toString()) * BigInt(10000 + gasLimitBufferBips)) /
           BigInt(10000);
       } catch (err) {
-        console.warn(
+        logWarn(
           "Gas estimation failed, using provider fallback or letting provider pick gasLimit:",
           (err as Error).message
         );
@@ -191,7 +192,7 @@ export class Sniper extends BaseContract {
         deadline,
         txRequest
       );
-      console.info({ hash: tx.hash }, "sniper: tx sent");
+      logInfo({ hash: tx.hash }, "sniper: tx sent");
 
       // wait for confirmation
       tx.wait();
@@ -215,7 +216,7 @@ export class Sniper extends BaseContract {
             (err as Error).message
           );
 
-        console.warn(
+        logWarn(
           `sniper: buyToken attempt ${attempt} failed:`,
           (err as Error).message
         );

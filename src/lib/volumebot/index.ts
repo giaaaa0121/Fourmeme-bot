@@ -4,24 +4,33 @@ import { Contract, parseEther } from "ethers";
 import { TContext } from "../../utils/types";
 import { ERC20_ABI, ROUTER_ABI } from "../../utils/abi";
 import {
-  BUSD_ADDRESS,
   ROUTER_ADDRESS,
   WBNB_ADDRESS,
 } from "../../utils/address";
 import { BaseContract } from "../base";
+import { logError, logInfo, logWarn } from "../../utils/logger";
+
+type VolumeConfig = {
+  intervalMs?: number;
+  token: string;
+  amountBnb?: string;
+  slippageBips?: number;
+};
 
 export class VolumeBot extends BaseContract {
-  private readonly ctx: TContext;
   private timer: NodeJS.Timeout | null = null;
-  private inFlight = false;
+  private running = false;
 
   constructor(ctx: TContext) {
     super(ctx.wallet, ctx.provider, ctx.simulationOnly);
   }
 
+  /**
+   * Read config and start recurring buy/sell cycles.
+   */
   run = async () => {
     const resolved = path.resolve(process.cwd(), "config.volume.json");
-    const cfg = JSON!.parse(fs.readFileSync(resolved, "utf-8"));
+    const cfg: VolumeConfig = JSON!.parse(fs.readFileSync(resolved, "utf-8"));
 
     const intervalMs = cfg.intervalMs ?? 15_000;
     const token = cfg.token;
@@ -37,18 +46,18 @@ export class VolumeBot extends BaseContract {
     try {
       await this.oneCycle(token, amountBnb, slippageBips);
     } catch (err) {
-      console.error("volume cycle error (immediate)", err);
+      logError("volume cycle error (immediate)", err);
     }
 
     this.timer = setInterval(async () => {
-      if (this.inFlight) return;
-      this.inFlight = true;
+      if (this.running) return; // Prevent overlap
+      this.running = true;
       try {
         await this.oneCycle(token, amountBnb, slippageBips);
       } catch (err) {
-        console.error("volume cycle error", err);
+        logError("volume cycle error", err);
       } finally {
-        this.inFlight = false;
+        this.running = false;
       }
     }, intervalMs);
   };
@@ -58,57 +67,81 @@ export class VolumeBot extends BaseContract {
     amountBnb: string,
     slippageBips: number
   ) {
-    const { wallet } = this.ctx;
+    const { wallet, simulationOnly } = this;
     const router = new Contract(ROUTER_ADDRESS, ROUTER_ABI, wallet);
+    const erc20 = new Contract(token, ERC20_ABI, wallet);
     const deadline = Math.floor(Date.now() / 1000) + 180;
 
-    // Buy
+    // === BUY ===
     const value = parseEther(amountBnb);
-    const outBuy: bigint[] = await router.getAmountsOut(value, [
-      WBNB_ADDRESS,
-      token,
-    ]);
+    const buyPath = [WBNB_ADDRESS, token];
+    const outBuy: bigint[] = await router.getAmountsOut(value, buyPath);
+    if (outBuy.length < 2) throw new Error("Router returned invalid buy path");
+
+    const expectedBuy = outBuy[1];
     const minOutBuy =
-      outBuy[1] - (outBuy[1] * BigInt(slippageBips)) / BigInt(10_000);
-    console.debug({ token, amountBnb }, "volume buy");
-    if (!this.ctx.simulationOnly) {
+      expectedBuy - (expectedBuy * BigInt(slippageBips)) / 10_000n;
+    logWarn(
+      { token, amountBnb, minOutBuy: minOutBuy.toString() },
+      "volume buy"
+    );
+
+    if (!simulationOnly) {
       const txB = await router.swapExactETHForTokens(
         minOutBuy,
-        [WBNB_ADDRESS, token],
+        buyPath,
         wallet.address,
         deadline,
         { value }
       );
+      logInfo(`Buy TX: ${txB.hash}`);
       await txB.wait();
     }
 
-    // Sell function
-    const erc20 = new Contract(token, ERC20_ABI, wallet);
+    // === SELL ===
     const balance: bigint = await erc20.balanceOf(wallet.address);
+    if (balance === 0n) {
+      logWarn("No token balance after buy, skipping sell");
+      return;
+    }
+
     const allowance: bigint = await erc20.allowance(
       wallet.address,
       ROUTER_ADDRESS
     );
-    if (allowance < balance && !this.ctx.simulationOnly) {
+    if (allowance < balance && !simulationOnly) {
       const approveTx = await erc20.approve(ROUTER_ADDRESS, balance);
+      logInfo(`Approve TX: ${approveTx.hash}`);
       await approveTx.wait();
     }
-    const amountOut: bigint[] = await router.getAmountsOut(balance, [
-      token,
-      WBNB_ADDRESS,
-    ]);
-    const minAmountOut =
-      amountOut[1] - (amountOut[1] * BigInt(slippageBips)) / BigInt(10_000);
-    console.debug({ token, balance: balance.toString() }, "volume sell");
-    if (!this.ctx.simulationOnly) {
+
+    const sellPath = [token, WBNB_ADDRESS];
+    const outSell: bigint[] = await router.getAmountsOut(balance, sellPath);
+    if (outSell.length < 2)
+      throw new Error("Router returned invalid sell path");
+
+    const expectedSell = outSell[1];
+    const minOutSell =
+      expectedSell - (expectedSell * BigInt(slippageBips)) / 10_000n;
+    logWarn(
+      {
+        token,
+        balance: balance.toString(),
+        minOutSell: minOutSell.toString(),
+      },
+      "volume sell"
+    );
+
+    if (!this.simulationOnly) {
       const txS =
         await router.swapExactTokensForETHSupportingFeeOnTransferTokens(
           balance,
-          minAmountOut,
+          minOutSell,
           [token, WBNB_ADDRESS],
-          wallet.address,
+          this.wallet.address,
           deadline
         );
+      logInfo(`Sell TX: ${txS.hash}`);
       await txS.wait();
     }
   }
