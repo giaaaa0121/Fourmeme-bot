@@ -123,10 +123,7 @@ export class Sniper extends BaseContract {
           }
         } catch (err) {
           // swallow provider balance failure — not fatal, but log
-          logWarn(
-            "Could not confirm wallet balance:",
-            (err as Error).message
-          );
+          logWarn("Could not confirm wallet balance:", (err as Error).message);
         }
       }
 
@@ -139,15 +136,12 @@ export class Sniper extends BaseContract {
       const expectedOut = amounts[amounts.length - 1];
       const minOut = computeMinOut(expectedOut, slippageBips);
 
-      logInfo(
-        {
-          tokenAddress,
-          maxBnb,
-          expectedOut: expectedOut.toString(),
-          minOut: minOut.toString(),
-        },
-        "sniper: prepared swap"
-      );
+      logInfo("sniper: prepared swap", {
+        tokenAddress,
+        maxBnb,
+        expectedOut: expectedOut.toString(),
+        minOut: minOut.toString(),
+      });
 
       if (this.simulationOnly) {
         logInfo("SimulationOnly is enabled — not sending transaction");
@@ -192,7 +186,7 @@ export class Sniper extends BaseContract {
         deadline,
         txRequest
       );
-      logInfo({ hash: tx.hash }, "sniper: tx sent");
+      logInfo("sniper: tx sent", { hash: tx.hash });
 
       // wait for confirmation
       tx.wait();

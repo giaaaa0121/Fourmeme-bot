@@ -10,16 +10,11 @@ export const getWalletAndProvider = ({
   chaindId: string;
   privateKey: string;
 }) => {
-  if (!rpcUrl) console.error(chalk.red("RPC_URL is required"));
-  if (!chaindId) console.error(chalk.red("CHAIN_ID is required"));
-  if (!privateKey) console.error(chalk.red("PRIVATE_KEY is required"));
-  
-  try {
-    const provider = new JsonRpcProvider(rpcUrl);
-    const wallet = new Wallet(privateKey, provider);
-    console.log("wallet", wallet.address);
-    return { provider, wallet };
-  } catch (e) {
-    console.error(chalk.red(e.message));
-  }
+  if (!rpcUrl) throw new Error("RPC_URL is required");
+  if (!chaindId) throw new Error("CHAIN_ID is required");
+  if (!privateKey) throw new Error("PRIVATE_KEY is required");
+
+  const provider = new JsonRpcProvider(rpcUrl, chaindId, { staticNetwork: true });
+  const wallet = new Wallet(privateKey, provider);
+  return { provider, wallet };
 };

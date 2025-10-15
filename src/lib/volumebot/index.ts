@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { Contract, parseEther } from "ethers";
 import { TContext } from "../../utils/types";
@@ -30,12 +30,13 @@ export class VolumeBot extends BaseContract {
    */
   run = async () => {
     const resolved = path.resolve(process.cwd(), "config.volume.json");
-    const cfg: VolumeConfig = JSON!.parse(fs.readFileSync(resolved, "utf-8"));
+    const raw = await fs.readFile(resolved, "utf-8");
+    const cfg: VolumeConfig = JSON.parse(raw);
 
-    const intervalMs = cfg.intervalMs ?? 15_000;
-    const token = cfg.token;
-    const amountBnb = cfg.amountBnb ?? "0.01";
-    const slippageBips = cfg.slippageBips ?? 800;
+    const intervalMs = Number(cfg.intervalMs ?? 15_000);
+    const token = String(cfg.token);
+    const amountBnb = String(cfg.amountBnb ?? "0.01");
+    const slippageBips = Math.max(1, Math.min(9900, Number(cfg.slippageBips ?? 800)));
 
     if (!/^0x[a-fA-F0-9]{40}$/.test(token)) {
       throw new Error("Invalid token address");
@@ -81,10 +82,7 @@ export class VolumeBot extends BaseContract {
     const expectedBuy = outBuy[1];
     const minOutBuy =
       expectedBuy - (expectedBuy * BigInt(slippageBips)) / 10_000n;
-    logWarn(
-      { token, amountBnb, minOutBuy: minOutBuy.toString() },
-      "volume buy"
-    );
+    logWarn("volume buy", { token, amountBnb, minOutBuy: minOutBuy.toString() });
 
     if (!simulationOnly) {
       const txB = await router.swapExactETHForTokens(
@@ -94,14 +92,14 @@ export class VolumeBot extends BaseContract {
         deadline,
         { value }
       );
-      logInfo(`Buy TX: ${txB.hash}`);
+      logInfo("buy submitted", { hash: txB.hash });
       await txB.wait();
     }
 
     // === SELL ===
     const balance: bigint = await erc20.balanceOf(wallet.address);
     if (balance === 0n) {
-      logWarn("No token balance after buy, skipping sell");
+      logWarn("no token balance after buy, skipping sell");
       return;
     }
 
@@ -111,7 +109,7 @@ export class VolumeBot extends BaseContract {
     );
     if (allowance < balance && !simulationOnly) {
       const approveTx = await erc20.approve(ROUTER_ADDRESS, balance);
-      logInfo(`Approve TX: ${approveTx.hash}`);
+      logInfo("approve submitted", { hash: approveTx.hash });
       await approveTx.wait();
     }
 
@@ -123,14 +121,7 @@ export class VolumeBot extends BaseContract {
     const expectedSell = outSell[1];
     const minOutSell =
       expectedSell - (expectedSell * BigInt(slippageBips)) / 10_000n;
-    logWarn(
-      {
-        token,
-        balance: balance.toString(),
-        minOutSell: minOutSell.toString(),
-      },
-      "volume sell"
-    );
+    logWarn("volume sell", { token, balance: balance.toString(), minOutSell: minOutSell.toString() });
 
     if (!this.simulationOnly) {
       const txS =
@@ -141,7 +132,7 @@ export class VolumeBot extends BaseContract {
           this.wallet.address,
           deadline
         );
-      logInfo(`Sell TX: ${txS.hash}`);
+      logInfo("sell submitted", { hash: txS.hash });
       await txS.wait();
     }
   }

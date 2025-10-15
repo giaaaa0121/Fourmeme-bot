@@ -1,13 +1,21 @@
 import chalk from "chalk";
 
-export const logInfo = (message?: any, ...optionalParams: any[]) => {
-  console.info(chalk.bgGreen(message, optionalParams));
+type Meta = Record<string, unknown> | unknown;
+
+function format(message: string, meta?: Meta): string {
+  const ts = new Date().toISOString();
+  const metaStr = meta === undefined ? "" : ` ${JSON.stringify(meta)}`;
+  return `[${ts}] ${message}${metaStr}`;
 }
 
-export const logWarn = (message?: any, ...optionalParams: any[]) => {
-  console.debug(chalk.bgYellow(message, optionalParams));
-}
+export const logInfo = (message: string, meta?: Meta) => {
+  console.info(chalk.green(format(message, meta)));
+};
 
-export const logError = (message?: any, ...optionalParams: any[]) => {
-  console.error(chalk.bgRed(message, optionalParams));
-}
+export const logWarn = (message: string, meta?: Meta) => {
+  console.warn(chalk.yellow(format(message, meta)));
+};
+
+export const logError = (message: string, meta?: Meta) => {
+  console.error(chalk.red(format(message, meta)));
+};
