@@ -1,6 +1,6 @@
 {
-  "name": "pancakeswap-bot",
-  "version": "1.0.0",
+  "name": "fourdotmeme-bot",
+  "version": "1.0.3",
   "description": "",
   "main": "start.js",
   "directories": {
@@ -11,12 +11,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "10xAngel",
   "license": "ISC",
   "dependencies": {
-    "ethers": "^5.0.32"
+    "axios": "^1.12.2",
+    "commander": "^14.0.1",
+    "dotenv": "^17.2.3",
+    "ethers": "^5.8.0",
+    "pino": "^10.0.0",
+    "pino-pretty": "^13.1.2"
   },
   "devDependencies": {
-    "@types/node": "^24.7.1"
+    "@types/node": "^24.7.1",
+    "typescript": "^5.9.3"
   }
 }
