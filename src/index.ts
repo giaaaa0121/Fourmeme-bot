@@ -1,5 +1,7 @@
 import promptSync from "prompt-sync";
 import chalk from "chalk";
+import { getWalletAndProvider } from "./utils/provider";
+import { VolumeBot } from "./lib/volumebot";
 
 const prompt = promptSync();
 
@@ -15,6 +17,10 @@ async function main() {
 
   const menuOptions = ["1. Volume Bot", "2. Sniper", "3. Exit"];
 
+  const rpcUrl = "";
+  const chaindId = "";
+  const priKey = "";
+
   while (true) {
     console.log(chalk.green("\nMain Menu\n"));
     menuOptions.forEach((option) => console.log(chalk.white(option)));
@@ -23,11 +29,16 @@ async function main() {
     try {
       switch (choice) {
         case "1":
-          
+          const { wallet, provider } = getWalletAndProvider({
+            rpcUrl,
+            chaindId,
+            priKey,
+          });
+          console.log("1 is selected");
+          const volumeBot = new VolumeBot({ wallet, provider, dryRun: true });
           break;
 
         case "2":
-          
           break;
 
         case "3":
