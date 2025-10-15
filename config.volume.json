@@ -1,0 +1,6 @@
+{
+  "token": "0x...token1",
+  "amountBnb": "0.01",
+  "slippageBips": 800,
+  "intervalMs": 15000
+}

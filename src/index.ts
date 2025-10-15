@@ -1,9 +1,11 @@
-import promptSync from "prompt-sync";
+import inquirer from "inquirer";
 import chalk from "chalk";
-import { getWalletAndProvider } from "./utils/provider";
-import { VolumeBot } from "./lib/volumebot";
+import dotenv from "dotenv";
+dotenv.config();
 
-const prompt = promptSync();
+import { getWalletAndProvider } from "./utils/ethers";
+import { VolumeBot } from "./lib/volumebot";
+import { Sniper } from "./lib/sniper";
 
 async function main() {
   console.clear();
@@ -17,41 +19,55 @@ async function main() {
 
   const menuOptions = ["1. Volume Bot", "2. Sniper", "3. Exit"];
 
-  const rpcUrl = "";
-  const chaindId = "";
-  const priKey = "";
+  const rpcUrl = process.env.RPC_URL;
+  const chaindId = process.env.CHAIN_ID;
+  const privateKey = process.env.PRIVATE_KEY;
+  const { wallet, provider } = getWalletAndProvider({
+    rpcUrl,
+    chaindId,
+    privateKey,
+  });
 
-  while (true) {
-    console.log(chalk.green("\nMain Menu\n"));
-    menuOptions.forEach((option) => console.log(chalk.white(option)));
+  console.log(chalk.green("\nMain Menu"));
+  menuOptions.forEach((option) => console.log(chalk.white(option)));
 
-    const choice = prompt(chalk.yellow("\nSelect option: "));
-    try {
+  await inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "choice",
+        message: chalk.yellow("\nSelect option: "),
+      },
+    ])
+    .then(async (answers) => {
+      const choice = Number(answers.choice);
       switch (choice) {
-        case "1":
-          const { wallet, provider } = getWalletAndProvider({
-            rpcUrl,
-            chaindId,
-            priKey,
-          });
-          console.log("1 is selected");
-          const volumeBot = new VolumeBot({ wallet, provider, dryRun: true });
+        case 1:
+          const volumeBot = new VolumeBot({ wallet, provider });
+          await volumeBot.run();
           break;
 
-        case "2":
+        case 2:
+          const sniper = new Sniper({ wallet, provider });
+          await sniper.run();
           break;
 
-        case "3":
+        case 3:
           process.exit(0);
 
         default:
           console.log(chalk.red("Invalid option"));
       }
-    } catch (error: any) {
-      console.log(error);
-      console.error(chalk.red(`Error: ${error.message}`));
-    }
-  }
+    })
+    .catch((error) => {
+      if (error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else went wrong
+      }
+    });
 }
 
-main();
+main().catch((err) => {
+  console.error("Error:", err);
+});
