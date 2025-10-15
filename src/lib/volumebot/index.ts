@@ -1,14 +1,14 @@
 import { Contract, parseEther } from "ethers";
-import { TCtx } from "../../utils/types";
+import { TContext } from "../../utils/types";
 import { ERC20_ABI, ROUTER_ABI } from "../../utils/abi";
 import { ROUTER_ADDRESS, WBNB_ADDRESS } from "../../utils/address";
 
 export class VolumeBot {
-  private readonly ctx: TCtx;
+  private readonly ctx: TContext;
   private timer: NodeJS.Timeout | null = null;
   private inFlight = false;
 
-  constructor(ctx: TCtx) {
+  constructor(ctx: TContext) {
     this.ctx = ctx;
   }
 
