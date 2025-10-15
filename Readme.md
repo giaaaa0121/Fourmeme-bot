@@ -1,3 +1,5 @@
+[简体中文](./Readme.cn.md)
+
 # 🧰 Four.meme (BNB) Toolkit
 
 ![](./banner.png)
@@ -8,7 +10,7 @@
 Before you begin, ensure you have the following installed and configured:
 - [🟢 Node.js v22.15+](https://nodejs.org/en/download)
 - 🌐 A BNB Chain RPC endpoint (the default public RPC can be used)
-- 🔑 A funded wallet private key (BNB for gas and swaps)
+- 🔑 A funded wallet private key
 
 ### 1. Install Dependencies
 Clone the repository and install project dependencies:
