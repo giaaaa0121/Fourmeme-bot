@@ -29,7 +29,7 @@ export class Sniper {
 
     const amounts: bigint[] = await router!.getAmountsOut(value, path);
     if (amounts.length < 2) {
-      throw new Error("Invalid router path or illiquid pair");
+      throw new Error("Invalid router path or Non-liquid pair");
     }
     const expectedOut: bigint = amounts[amounts.length - 1];
     const minOut =
