@@ -23,7 +23,7 @@ Open a **Feature Request** issue to share your suggestion or improvement.
 
 ### 💬 Questions / Discussions
 If you just want to talk shop — ask questions, share feedback, or discuss implementations — join our community:
-- Call me anytime at +1 (628) 666 6724.
+- 🤙 WhatsApp +1 (628) 666 6724
 - 🌐 [Discussions](../../discussions)
 - 💬 [Telegram](https://t.me/angel001000010100)
 
