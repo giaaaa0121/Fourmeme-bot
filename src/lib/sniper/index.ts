@@ -6,6 +6,7 @@ import { ROUTER_ADDRESS, WBNB_ADDRESS } from "../../utils/address";
 import { ROUTER_ABI } from "../../utils/abi";
 import { BaseContract } from "../base";
 import { logError, logInfo, logWarn } from "../../utils/logger";
+import { safeParseJson } from "../../utils/json";
 
 type Target = {
   token: string;
@@ -30,24 +31,18 @@ const DEFAULT_RETRIES = 3;
 const DEFAULT_GAS_LIMIT_BUFFER_BIPS = 2000; // +20%
 
 export class Sniper extends BaseContract {
-  constructor(ctx: TContext) {
+  private readonly configPath = path.resolve(
+    process.cwd(),
+    "config.sniper.json"
+  );
+  constructor(private readonly ctx: TContext) {
     super(ctx.wallet, ctx.provider, ctx.simulationOnly);
   }
 
-  private safeParseJson<T>(text: string): T | null {
-    try {
-      return JSON.parse(text) as T;
-    } catch (err) {
-      logError("Failed to parse JSON:", err);
-      return null;
-    }
-  }
-
   async run() {
-    const resolved = path.resolve(process.cwd(), "config.sniper.json");
-    const raw = fs.readFileSync(resolved, "utf-8");
+    const raw = fs.readFileSync(this.configPath, "utf-8");
 
-    const cfg = this.safeParseJson<SniperConfig>(raw);
+    const cfg = safeParseJson<SniperConfig>(raw);
     if (!cfg || !Array.isArray(cfg.targets)) {
       logWarn("No valid targets found in config.sniper.json");
       return;

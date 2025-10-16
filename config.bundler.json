@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "kind": "buy",
+      "token": "0x...token1",
+      "amountBnb": "0.02",
+      "slippageBips": 800,
+      "deadlineSec": 300
+    }
+  ]
+}
