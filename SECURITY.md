@@ -25,4 +25,4 @@ since it contains real wallet information. If you discover a security vulnerabil
 ## Thank You
 
 Your help in keeping my fourdotmeme bot resources secure is greatly appreciated!
-Responsible disclosure of security vulnerabilities helps protect our entire school community.
+Responsible disclosure of security vulnerabilities helps protect our entire web3 community.
