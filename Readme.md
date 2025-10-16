@@ -47,7 +47,4 @@ It includes modules for:
 - 🔄 Custom trade execution logic
 - 🧩 Extendable contract integrations
 
-##
-If you have any new ideas or good perspectives on how to improve the bot, please create your own branch and create a pull request.
-
-If you have any questions, please call us anytime at +1 (628) 666 6724. If I am busy with events and you don't get a response, please send a message to [Tg](https://t.me/angel001000010100).
+---
