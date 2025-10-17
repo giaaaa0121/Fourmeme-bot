@@ -1,0 +1,6 @@
+{
+  "targets": ["0x...guru1"],
+  "defaultToken": "0x...token1",
+  "positionPercent": 10,
+  "maxBnbPerTrade": "0.05"
+}

@@ -4,8 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { getWalletAndProvider } from "./utils/ethers";
-import { VolumeBot } from "./lib/volumebot";
+import { VolumeBot } from "./lib/volume";
 import { Sniper } from "./lib/sniper";
+import { Bundler } from "./lib/bundler";
+import { CopyGuru } from "./lib/copy";
 
 async function main() {
   console.clear();
@@ -53,6 +55,16 @@ async function main() {
           break;
 
         case 3:
+          const bundler = new Bundler({ wallet, provider });
+          await bundler.run();
+          break;
+
+        case 4:
+          const copyGuru = new CopyGuru({ wallet, provider });
+          await copyGuru.run();
+          break;
+
+        case 5:
           process.exit(0);
 
         default:

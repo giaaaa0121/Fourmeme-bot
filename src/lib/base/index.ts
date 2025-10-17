@@ -54,4 +54,13 @@ export class BaseContract {
       return ethers.formatEther("100000"); // Fallback gas limit
     }
   }
+
+  // Function to get tx detail
+  protected async getTransaction(tx) {
+    try {
+      return await this.provider.getTransaction(tx);
+    } catch (error) {
+      console.error("⚠️ Error getting tx:", error.message);
+    }
+  }
 }
