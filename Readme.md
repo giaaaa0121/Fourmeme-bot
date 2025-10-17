@@ -38,6 +38,11 @@ npm run build
 ```
 This generates the production-ready build in the /dist directory.
 
+### 4. Run the Project
+```bash
+npm run start
+```
+
 ## ⚙️ Project Overview
 This toolkit is built for developers building automated trading bots, liquidity strategies, and utility scripts on the BNB Chain.
 
